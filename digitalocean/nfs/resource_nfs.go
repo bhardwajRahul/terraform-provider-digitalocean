@@ -49,7 +49,7 @@ func ResourceDigitalOceanNfs() *schema.Resource {
 			"performance_tier": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "standard",
+				Default:  "high",
 				ValidateFunc: validation.StringInSlice([]string{
 					"standard",
 					"high",

@@ -76,8 +76,14 @@ func ResourceDigitalOceanDedicatedInference() *schema.Resource {
 						"model_provider": {
 							Type:         schema.TypeString,
 							Required:     true,
-							Description:  "The provider of the model (e.g. 'digitalocean', 'huggingface').",
+							Description:  "The provider of the model (e.g. 'modelcatalog', 'hugging_face').",
 							ValidateFunc: validation.NoZeroValues,
+						},
+						"provider_model_id": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
+							Description: "The provider-specific model ID. Required when model_provider is 'hugging_face', optional for 'modelcatalog'.",
 						},
 						"model_id": {
 							Type:        schema.TypeString,
@@ -381,8 +387,9 @@ func expandModelDeployments(raw []interface{}) []*godo.DedicatedInferenceModelRe
 	for _, item := range raw {
 		m := item.(map[string]interface{})
 		deployment := &godo.DedicatedInferenceModelRequest{
-			ModelSlug:     m["model_slug"].(string),
-			ModelProvider: m["model_provider"].(string),
+			ModelSlug:       m["model_slug"].(string),
+			ModelProvider:   m["model_provider"].(string),
+			ProviderModelID: m["provider_model_id"].(string),
 		}
 		if v, ok := m["model_id"].(string); ok && v != "" {
 			deployment.ModelID = v
@@ -412,10 +419,11 @@ func flattenModelDeployments(deployments []*godo.DedicatedInferenceModelDeployme
 	result := make([]interface{}, 0, len(deployments))
 	for _, d := range deployments {
 		m := map[string]interface{}{
-			"model_id":       d.ModelID,
-			"model_slug":     d.ModelSlug,
-			"model_provider": d.ModelProvider,
-			"accelerators":   flattenAccelerators(d.Accelerators),
+			"model_id":          d.ModelID,
+			"model_slug":        d.ModelSlug,
+			"model_provider":    d.ModelProvider,
+			"provider_model_id": d.ProviderModelID,
+			"accelerators":      flattenAccelerators(d.Accelerators),
 		}
 		result = append(result, m)
 	}

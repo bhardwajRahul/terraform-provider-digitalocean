@@ -59,6 +59,13 @@ func dedicatedInferenceListItemSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Description: "The date and time when the dedicated inference endpoint was last updated.",
 		},
+		"provider_model_id": {
+			Type:        schema.TypeList,
+			Description: "The list of provider model IDs for the dedicated inference endpoint.",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -100,11 +107,12 @@ func flattenDigitalOceanDedicatedInferenceListItem(record, _ interface{}, _ map[
 	item := record.(godo.DedicatedInferenceListItem)
 
 	flat := map[string]interface{}{
-		"id":       item.ID,
-		"name":     item.Name,
-		"region":   item.Region,
-		"status":   item.Status,
-		"vpc_uuid": item.VPCUUID,
+		"id":                item.ID,
+		"name":              item.Name,
+		"region":            item.Region,
+		"status":            item.Status,
+		"vpc_uuid":          item.VPCUUID,
+		"provider_model_id": item.ProviderModelID,
 	}
 
 	if item.Endpoints != nil {
